@@ -3,6 +3,15 @@ title Cat Companion
 color 0D
 mode con: cols=60 lines=30
 
+:: Create error log file
+set LOG_FILE=cat_companion_error.log
+echo [%date% %time%] Starting Cat Companion > %LOG_FILE%
+
+:: Function to log errors
+:log_error
+echo [%date% %time%] ERROR: %~1 >> %LOG_FILE%
+exit /b
+
 :: Clear screen and set cursor position
 cls
 echo.
@@ -46,12 +55,13 @@ if %errorlevel% neq 0 (
     echo.
     echo    Press any key to exit...
     pause >nul
+    call :log_error "Python not found"
     exit /b 1
 ) else (
     echo    ║  ✅ Python installed       ║
 )
 
-:: Check if Python is in PATH
+:: Check Python installation location
 where python >nul 2>&1
 if %errorlevel% neq 0 (
     echo    ║  ❌ Python not in PATH     ║
@@ -69,34 +79,29 @@ if %errorlevel% neq 0 (
     echo.
     echo    Press any key to exit...
     pause >nul
+    call :log_error "Python not in PATH"
     exit /b 1
 )
 
-:: Check Python version
-for /f "tokens=2" %%I in ('python --version 2^>^&1') do set PYTHON_VERSION=%%I
-for /f "tokens=1 delims=." %%I in ("%PYTHON_VERSION%") do set PYTHON_MAJOR=%%I
-for /f "tokens=2 delims=." %%I in ("%PYTHON_VERSION%") do set PYTHON_MINOR=%%I
-
-if %PYTHON_MAJOR% LSS 3 (
-    echo    ║  ❌ Python version too old  ║
-    echo    ║  Need Python 3.8 or higher  ║
+:: Check Python version and installation integrity
+python -c "import sys; print(sys.executable)" >nul 2>&1
+if %errorlevel% neq 0 (
+    echo    ║  ❌ Python installation corrupted ║
     echo    ╚══════════════════════════════╝
     echo.
-    echo    Opening Python download page...
-    start https://www.python.org/downloads/
-    echo.
-    echo    [ERROR] Your Python version (%PYTHON_VERSION%) is too old
-    echo    Cat Companion requires Python 3.8 or higher
-    echo    Please download and install the latest version
+    echo    [ERROR] Python installation appears to be corrupted
+    echo    Please try:
+    echo    1. Uninstall Python completely
+    echo    2. Delete Python folders from:
+    echo       - C:\Users\%USERNAME%\AppData\Local\Programs\Python
+    echo       - C:\Users\%USERNAME%\AppData\Roaming\Python
+    echo    3. Reinstall Python
+    echo    4. RESTART your computer
     echo.
     echo    Press any key to exit...
     pause >nul
+    call :log_error "Python installation corrupted"
     exit /b 1
-) else if %PYTHON_MINOR% LSS 8 (
-    echo    ║  ⚠️ Python version old     ║
-    echo    ║  Recommend Python 3.8+     ║
-) else (
-    echo    ║  ✅ Python version OK      ║
 )
 
 :: Check if pip is installed
@@ -124,6 +129,7 @@ if %errorlevel% neq 0 (
         echo.
         echo    Press any key to exit...
         pause >nul
+        call :log_error "Failed to install pip"
         exit /b 1
     )
     echo    ║  ✅ pip installed          ║
@@ -143,6 +149,7 @@ if %errorlevel% neq 0 (
     echo.
     echo    Press any key to exit...
     pause >nul
+    call :log_error "No internet connection"
     exit /b 1
 )
 
@@ -168,6 +175,7 @@ if %errorlevel% neq 0 (
         echo.
         echo    Press any key to exit...
         pause >nul
+        call :log_error "Failed to install PyQt6"
         exit /b 1
     )
     echo    ║  ✅ PyQt6 installed        ║
@@ -197,6 +205,7 @@ if %errorlevel% neq 0 (
         echo.
         echo    Press any key to exit...
         pause >nul
+        call :log_error "Failed to install pywin32"
         exit /b 1
     )
     echo    ║  ✅ pywin32 installed      ║
@@ -215,6 +224,7 @@ if not exist cat_companion.py (
     echo.
     echo    Press any key to exit...
     pause >nul
+    call :log_error "Main script missing"
     exit /b 1
 )
 
@@ -236,8 +246,22 @@ timeout /t 1 /nobreak >nul
 echo    [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%%
 echo.
 
-:: Start the application and minimize the window
-start /min python cat_companion.py
+:: Try to start the application with error handling
+echo    Starting application...
+python cat_companion.py 2>> %LOG_FILE%
+if %errorlevel% neq 0 (
+    echo    [ERROR] Application crashed
+    echo    Please check cat_companion_error.log for details
+    echo    Common issues:
+    echo    1. Python installation issues
+    echo    2. Missing dependencies
+    echo    3. Permission problems
+    echo.
+    echo    Press any key to exit...
+    pause >nul
+    call :log_error "Application crashed"
+    exit /b 1
+)
 
 :: Wait a moment for the application to start
 timeout /t 2 /nobreak >nul
