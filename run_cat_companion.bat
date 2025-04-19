@@ -25,7 +25,7 @@ echo    ╔═══════════════════════
 echo    ║        Status Check          ║
 echo    ╠══════════════════════════════╣
 
-:: Check if Python is installed
+:: Check if Python is installed and in PATH
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo    ║  ❌ Python not found        ║
@@ -39,13 +39,37 @@ if %errorlevel% neq 0 (
     echo.
     echo    [ERROR] Python is required to run Cat Companion
     echo    Please install Python 3.8 or higher from python.org
-    echo    Make sure to check "Add Python to PATH" during installation
+    echo    IMPORTANT: During installation:
+    echo    1. Check "Add Python to PATH"
+    echo    2. Choose "Install Now" (not "Customize")
+    echo    3. After installation, RESTART your computer
     echo.
     echo    Press any key to exit...
     pause >nul
     exit /b 1
 ) else (
     echo    ║  ✅ Python installed       ║
+)
+
+:: Check if Python is in PATH
+where python >nul 2>&1
+if %errorlevel% neq 0 (
+    echo    ║  ❌ Python not in PATH     ║
+    echo    ╚══════════════════════════════╝
+    echo.
+    echo    [ERROR] Python is installed but not in PATH
+    echo    This usually happens when:
+    echo    1. Python was installed without "Add to PATH" checked
+    echo    2. Computer wasn't restarted after installation
+    echo.
+    echo    Please try:
+    echo    1. Uninstall Python
+    echo    2. Reinstall Python with "Add to PATH" checked
+    echo    3. RESTART your computer
+    echo.
+    echo    Press any key to exit...
+    pause >nul
+    exit /b 1
 )
 
 :: Check Python version
@@ -90,11 +114,13 @@ if %errorlevel% neq 0 (
         echo    1. Python installation is incomplete
         echo    2. No internet connection
         echo    3. Permission issues
+        echo    4. Computer needs to be restarted
         echo.
         echo    Please try:
-        echo    1. Reinstalling Python
-        echo    2. Running as administrator
-        echo    3. Checking your internet connection
+        echo    1. RESTART your computer
+        echo    2. If still not working, reinstall Python
+        echo    3. Run as administrator
+        echo    4. Check your internet connection
         echo.
         echo    Press any key to exit...
         pause >nul
