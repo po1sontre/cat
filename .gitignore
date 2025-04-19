@@ -32,3 +32,4 @@ ENV/
 *.swo
 
 # Application specific
+stats.json
