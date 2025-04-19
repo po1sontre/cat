@@ -821,7 +821,7 @@ class CatCompanion(QMainWindow):
             # Position media controls directly under the GIF
             self.media_controls.setGeometry(
                 0,  # Align with window
-                self.base_size.height() + 4,  # Small gap after GIF
+                self.cat_label.height() + 4,  # Small gap after GIF
                 self.width(),  # Full window width
                 36  # Just enough height for the buttons
             )
@@ -1276,11 +1276,14 @@ class CatCompanion(QMainWindow):
     def toggle_media_controls(self):
         self.show_media_controls = not self.show_media_controls
         self.toggle_media_action.setChecked(self.show_media_controls)
-        # Resize window based on media controls visibility
+        
+        # Update window size
         if self.show_media_controls:
-            self.resize(self.base_size.width(), self.base_size.height() + 40)  # 40px for media controls
+            self.resize(self.width(), self.cat_label.height() + 40)  # 40px for media controls
         else:
-            self.resize(self.base_size.width(), self.base_size.height())
+            self.resize(self.width(), self.cat_label.height())
+            
+        # Update media controls position
         self.update_media_controls_position()
         self.save_settings()
 
@@ -1623,6 +1626,51 @@ class CatCompanion(QMainWindow):
     def show_achievements(self):
         dialog = AchievementsDialog(self)
         dialog.exec()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        
+        # Update cat label size to match window width
+        self.cat_label.setGeometry(0, 0, self.width(), self.height() - (40 if self.show_media_controls else 0))
+        
+        # Update media controls position and size
+        if self.show_media_controls:
+            self.media_controls.setGeometry(
+                0,  # Align with window
+                self.cat_label.height() + 4,  # Small gap after GIF
+                self.width(),  # Full window width
+                36  # Just enough height for the buttons
+            )
+            self.media_controls.show()
+        else:
+            self.media_controls.hide()
+            
+    def update_media_controls_position(self):
+        if self.show_media_controls:
+            # Position media controls directly under the GIF
+            self.media_controls.setGeometry(
+                0,  # Align with window
+                self.cat_label.height() + 4,  # Small gap after GIF
+                self.width(),  # Full window width
+                36  # Just enough height for the buttons
+            )
+            self.media_controls.show()
+        else:
+            self.media_controls.hide()
+            
+    def toggle_media_controls(self):
+        self.show_media_controls = not self.show_media_controls
+        self.toggle_media_action.setChecked(self.show_media_controls)
+        
+        # Update window size
+        if self.show_media_controls:
+            self.resize(self.width(), self.cat_label.height() + 40)  # 40px for media controls
+        else:
+            self.resize(self.width(), self.cat_label.height())
+            
+        # Update media controls position
+        self.update_media_controls_position()
+        self.save_settings()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
