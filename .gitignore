@@ -22,8 +22,8 @@ wheels/
 
 # Virtual Environment
 venv/
-env/
 ENV/
+env/
 
 # IDE
 .idea/
@@ -31,5 +31,14 @@ ENV/
 *.swp
 *.swo
 
-# Application specific
+# Logs
+*.log
+logs/
+cat_companion_setup.log
+cat_companion_error.log
+
+# Stats
 stats.json
+
+# Assets
+assets/
