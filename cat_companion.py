@@ -785,9 +785,18 @@ class CatCompanion(QMainWindow):
     def update_window_size(self):
         if hasattr(self, 'movie') and self.movie:
             original_size = self.movie.frameRect().size()
-            self.scale_factor = 0.25  # Make the window 25% of the original size
             
-            # Calculate initial size
+            # Get the screen size
+            screen = QApplication.primaryScreen().geometry()
+            max_width = screen.width() * 0.3  # Maximum 30% of screen width
+            max_height = screen.height() * 0.3  # Maximum 30% of screen height
+            
+            # Calculate scale factor to fit within screen bounds while maintaining aspect ratio
+            width_scale = max_width / original_size.width()
+            height_scale = max_height / original_size.height()
+            self.scale_factor = min(width_scale, height_scale, 1.0)  # Don't scale up
+            
+            # Calculate scaled size
             scaled_width = int(original_size.width() * self.scale_factor)
             scaled_height = int(original_size.height() * self.scale_factor)
             
@@ -1065,14 +1074,26 @@ class CatCompanion(QMainWindow):
             new_width = max(100, self.resize_start_size.width() + delta.x())
             new_height = max(100, self.resize_start_size.height() + delta.y())
             
-            # Maintain aspect ratio
-            aspect_ratio = self.resize_start_size.width() / self.resize_start_size.height()
-            if new_width / new_height > aspect_ratio:
-                new_width = int(new_height * aspect_ratio)
-            else:
-                new_height = int(new_width / aspect_ratio)
+            # Maintain aspect ratio based on original GIF size
+            if hasattr(self, 'movie') and self.movie:
+                original_size = self.movie.frameRect().size()
+                aspect_ratio = original_size.width() / original_size.height()
+                
+                if new_width / new_height > aspect_ratio:
+                    new_width = int(new_height * aspect_ratio)
+                else:
+                    new_height = int(new_width / aspect_ratio)
             
+            # Update window size
             self.resize(new_width, new_height)
+            
+            # Update cat label size
+            self.cat_label.setGeometry(0, 0, new_width, new_height)
+            
+            # Update media controls position if shown
+            if self.show_media_controls:
+                self.update_media_controls_position()
+            
             self.update()
         elif self.is_dragging and event.buttons() == Qt.MouseButton.LeftButton:
             self.move(event.globalPosition().toPoint() - self.drag_position)
