@@ -1,0 +1,35 @@
+{
+    "daily": {
+        "water_count": 9,
+        "cat_pets": 12,
+        "media_controls_used": 0,
+        "start_time": "13:44:02",
+        "last_water_time": "13:55:12"
+    },
+    "weekly": {
+        "water_count": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "streak": 0,
+        "best_day": 0
+    },
+    "achievements": {
+        "first_sip": true,
+        "hydration_hero": true,
+        "consistent_companion": false,
+        "cat_lover": false,
+        "music_master": false
+    },
+    "total": {
+        "water_count": 9,
+        "cat_pets": 12,
+        "media_controls_used": 0,
+        "days_used": 0
+    }
+}

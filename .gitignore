@@ -32,10 +32,3 @@ ENV/
 *.swo
 
 # Application specific
-*.json
-*.mp3
-*.wav
-*.gif
-!cat.gif  # Keep the default cat GIF
-!notification.mp3  # Keep the default notification sound
-!purr.mp3  # Keep the default purr sound 
